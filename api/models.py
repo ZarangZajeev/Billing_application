@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 # Create your models here.
 class USerProfile(models.Model):
@@ -10,6 +11,10 @@ class USerProfile(models.Model):
 
     def __str__(self):
         return self.shop_name
+def create_profile(sender,instance,created,**kwargs):
+    if created:
+        USerProfile.objects.create(User=instance)
+        
     
 class Category(models.Model):
     name=models.CharField(max_length=200)
@@ -40,3 +45,12 @@ class Bill(models.Model):
     customer_name=models.CharField(max_length=200)
     customer_phone=models.PositiveBigIntegerField()
     total_amount=models.PositiveIntegerField()
+
+    @property
+    def total_amount(self):
+        return self.quantity*self.product.price
+
+    def __str__(self):
+        return self.product
+    
+post_save.connect(create_profile,sender=User)
