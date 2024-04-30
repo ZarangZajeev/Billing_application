@@ -4,9 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import serializers
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import permissions, authentication
 
 from api.serializers import UserSerializer,UserProfileSerializer
 from api.models import USerProfile
+
 
 # Create your views here.
 class SignUpView(APIView):
@@ -18,7 +21,9 @@ class SignUpView(APIView):
             return Response(data=serializer.data)
         return Response(data=serializer.errors)
 
-class UserProfileURView(viewsets.ModelViewSet):
+class UserProfileView(viewsets.ModelViewSet):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[permissions.IsAuthenticated]
 
     serializer_class=UserProfileSerializer
     queryset=USerProfile.objects.all()
