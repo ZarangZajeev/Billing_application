@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -30,8 +31,7 @@ class UserProfileView(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     queryset=USerProfile.objects.all()
 
-    def perform_create(self, serializer):
-        user_profile_exists = USerProfile.objects.filter(user=self.request.user).exists()
-        if user_profile_exists:
-            raise ValidationError("User profile already exists")
-        serializer.save(user=self.request.user)
+    def get(self, request):
+        user_profile =USerProfile.objects.get(user=request.user)
+        serializer = UserProfileSerializer(user_profile)
+        return Response(serializer.data)

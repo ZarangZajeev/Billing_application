@@ -16,5 +16,5 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = USerProfile
-        fields = ["shop_name", "phone", "logo"]
+        fields = ["shop_name", "phone", "logo","user"]
         read_only_fields = ["id"]
