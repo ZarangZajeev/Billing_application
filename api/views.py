@@ -6,6 +6,8 @@ from rest_framework import viewsets
 from rest_framework import serializers
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import permissions, authentication
+from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 
 from api.serializers import UserSerializer,UserProfileSerializer
 from api.models import USerProfile
@@ -22,14 +24,14 @@ class SignUpView(APIView):
         return Response(data=serializer.errors)
 
 class UserProfileView(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
     authentication_classes=[JWTAuthentication]
-    permission_classes=[permissions.IsAuthenticated]
 
-    serializer_class=UserProfileSerializer
+    serializer_class = UserProfileSerializer
     queryset=USerProfile.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        raise serializers.ValidationError("Permission denied")
-    
-    def destroy(self, request, *args, **kwargs):
-        raise serializers.ValidationError("Permission denied")
+    def perform_create(self, serializer):
+        user_profile_exists = USerProfile.objects.filter(user=self.request.user).exists()
+        if user_profile_exists:
+            raise ValidationError("User profile already exists")
+        serializer.save(user=self.request.user)
